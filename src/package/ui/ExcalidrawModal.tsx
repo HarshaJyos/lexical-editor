@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -6,56 +8,36 @@
  *
  */
 
-import type {JSX} from 'react';
+import type { JSX } from 'react';
+import dynamic from 'next/dynamic';
 
 import './ExcalidrawModal.css';
 
-import {Excalidraw} from '@excalidraw/excalidraw';
-import {
-  AppState,
-  BinaryFiles,
-  ExcalidrawImperativeAPI,
-  ExcalidrawInitialDataState,
-} from '@excalidraw/excalidraw/types/types';
-import {isDOMNode} from 'lexical';
+
+import { isDOMNode } from 'lexical';
 import * as React from 'react';
-import {ReactPortal, useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {createPortal} from 'react-dom';
+import { ReactPortal, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import Button from './Button';
 import Modal from './Modal';
+import { AppState, BinaryFiles, ExcalidrawImperativeAPI, ExcalidrawInitialDataState } from '@excalidraw/excalidraw/types/types';
+
+// Dynamically import Excalidraw to disable SSR
+const Excalidraw = dynamic(() => import('@excalidraw/excalidraw').then((mod) => mod.Excalidraw), {
+  ssr: false,
+});
 
 export type ExcalidrawInitialElements = ExcalidrawInitialDataState['elements'];
 
 type Props = {
   closeOnClickOutside?: boolean;
-  /**
-   * The initial set of elements to draw into the scene
-   */
   initialElements: ExcalidrawInitialElements;
-  /**
-   * The initial set of elements to draw into the scene
-   */
   initialAppState: AppState;
-  /**
-   * The initial set of elements to draw into the scene
-   */
   initialFiles: BinaryFiles;
-  /**
-   * Controls the visibility of the modal
-   */
   isShown?: boolean;
-  /**
-   * Callback when closing and discarding the new changes
-   */
   onClose: () => void;
-  /**
-   * Completely remove Excalidraw component
-   */
   onDelete: () => void;
-  /**
-   * Callback when the save button is clicked
-   */
   onSave: (
     elements: ExcalidrawInitialElements,
     appState: Partial<AppState>,
@@ -73,11 +55,6 @@ export const useCallbackRefState = () => {
   return [refValue, refCallback] as const;
 };
 
-/**
- * @explorer-desc
- * A component which renders a modal with Excalidraw (a painting app)
- * which can be used to export an editable image
- */
 export default function ExcalidrawModal({
   closeOnClickOutside = false,
   onSave,
@@ -153,7 +130,6 @@ export default function ExcalidrawModal({
   const save = () => {
     if (elements && elements.filter((el) => !el.isDeleted).length > 0) {
       const appState = excalidrawAPI?.getAppState();
-      // We only need a subset of the state
       const partialState: Partial<AppState> = {
         exportBackground: appState?.exportBackground,
         exportScale: appState?.exportScale,
@@ -169,7 +145,6 @@ export default function ExcalidrawModal({
       };
       onSave(elements, partialState, files);
     } else {
-      // delete node if the scene is clear
       onDelete();
     }
   };
@@ -185,20 +160,23 @@ export default function ExcalidrawModal({
         onClose={() => {
           setDiscardModalOpen(false);
         }}
-        closeOnClickOutside={false}>
+        closeOnClickOutside={false}
+      >
         Are you sure you want to discard the changes?
         <div className="ExcalidrawModal__discardModal">
           <Button
             onClick={() => {
               setDiscardModalOpen(false);
               onClose();
-            }}>
+            }}
+          >
             Discard
           </Button>{' '}
           <Button
             onClick={() => {
               setDiscardModalOpen(false);
-            }}>
+            }}
+          >
             Cancel
           </Button>
         </div>
@@ -224,14 +202,15 @@ export default function ExcalidrawModal({
       <div
         className="ExcalidrawModal__modal"
         ref={excaliDrawModelRef}
-        tabIndex={-1}>
+        tabIndex={-1}
+      >
         <div className="ExcalidrawModal__row">
           {discardModalOpen && <ShowDiscardDialog />}
           <Excalidraw
             onChange={onChange}
             excalidrawAPI={excalidrawAPIRefCallback}
             initialData={{
-              appState: initialAppState || {isLoading: false},
+              appState: initialAppState || { isLoading: false },
               elements: initialElements,
               files: initialFiles,
             }}
