@@ -9,13 +9,10 @@
 import type {JSX} from 'react';
 
 import {exportToSvg} from '@excalidraw/excalidraw';
-import {
-  ExcalidrawElement,
-  NonDeleted,
-} from '@excalidraw/excalidraw/types/element/types';
-import {AppState, BinaryFiles} from '@excalidraw/excalidraw/types/types';
+import {AppState, BinaryFiles} from '@excalidraw/excalidraw/types';
 import * as React from 'react';
 import {useEffect, useState} from 'react';
+import { ExcalidrawElement, NonDeleted } from '@excalidraw/excalidraw/element/types';
 
 type ImageType = 'svg' | 'canvas';
 
