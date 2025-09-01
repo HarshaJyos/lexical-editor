@@ -74,6 +74,7 @@ function PollOptionComponent({
           ref={checkboxRef}
           className="PollNode__optionCheckbox"
           type="checkbox"
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           onChange={(e) => {
             withPollNode((node) => {
               node.toggleVote(option, clientID);

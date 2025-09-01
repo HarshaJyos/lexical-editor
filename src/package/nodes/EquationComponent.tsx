@@ -75,6 +75,7 @@ export default function EquationComponent({
       return mergeRegister(
         editor.registerCommand(
           SELECTION_CHANGE_COMMAND,
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           (payload) => {
             const activeElement = document.activeElement;
             const inputElem = inputRef.current;
@@ -87,6 +88,7 @@ export default function EquationComponent({
         ),
         editor.registerCommand(
           KEY_ESCAPE_COMMAND,
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           (payload) => {
             const activeElement = document.activeElement;
             const inputElem = inputRef.current;

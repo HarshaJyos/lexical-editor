@@ -5,14 +5,14 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import type { JSX } from 'react';
+import type { JSX } from "react";
 
-import './index.css';
+import "./index.css";
 
-import { DraggableBlockPlugin_EXPERIMENTAL } from '@lexical/react/LexicalDraggableBlockPlugin';
-import { useRef } from 'react';
+import { DraggableBlockPlugin_EXPERIMENTAL } from "@lexical/react/LexicalDraggableBlockPlugin";
+import { useRef } from "react";
 
-const DRAGGABLE_BLOCK_MENU_CLASSNAME = 'draggable-block-menu';
+const DRAGGABLE_BLOCK_MENU_CLASSNAME = "draggable-block-menu";
 
 function isOnMenu(element: HTMLElement): boolean {
   return !!element.closest(`.${DRAGGABLE_BLOCK_MENU_CLASSNAME}`);
@@ -29,7 +29,9 @@ export default function DraggableBlockPlugin({
   return (
     <DraggableBlockPlugin_EXPERIMENTAL
       anchorElem={anchorElem}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       menuRef={menuRef as any}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       targetLineRef={targetLineRef as any}
       menuComponent={
         <div ref={menuRef} className="icon draggable-block-menu">

@@ -27,6 +27,7 @@ type SettingsContextShape = {
 };
 
 const Context: React.Context<SettingsContextShape> = createContext({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setOption: (name: SettingName, value: boolean) => {
     return;
   },

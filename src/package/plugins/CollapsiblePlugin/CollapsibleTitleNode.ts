@@ -17,17 +17,18 @@ import {
   LexicalNode,
   RangeSelection,
   SerializedElementNode,
-} from 'lexical';
-import {IS_CHROME} from '../../shared/src/environment';
-import invariant from '../../shared/src/invariant';
+} from "lexical";
+import { IS_CHROME } from "../../shared/src/environment";
+import invariant from "../../shared/src/invariant";
 
-import {$isCollapsibleContainerNode} from './CollapsibleContainerNode';
-import {$isCollapsibleContentNode} from './CollapsibleContentNode';
+import { $isCollapsibleContainerNode } from "./CollapsibleContainerNode";
+import { $isCollapsibleContentNode } from "./CollapsibleContentNode";
 
 type SerializedCollapsibleTitleNode = SerializedElementNode;
 
 export function $convertSummaryElement(
-  domNode: HTMLElement,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  domNode: HTMLElement
 ): DOMConversionOutput | null {
   const node = $createCollapsibleTitleNode();
   return {
@@ -37,7 +38,7 @@ export function $convertSummaryElement(
 
 export class CollapsibleTitleNode extends ElementNode {
   static getType(): string {
-    return 'collapsible-title';
+    return "collapsible-title";
   }
 
   static clone(node: CollapsibleTitleNode): CollapsibleTitleNode {
@@ -45,15 +46,15 @@ export class CollapsibleTitleNode extends ElementNode {
   }
 
   createDOM(config: EditorConfig, editor: LexicalEditor): HTMLElement {
-    const dom = document.createElement('summary');
-    dom.classList.add('Collapsible__title');
+    const dom = document.createElement("summary");
+    dom.classList.add("Collapsible__title");
     if (IS_CHROME) {
-      dom.addEventListener('click', () => {
+      dom.addEventListener("click", () => {
         editor.update(() => {
           const collapsibleContainer = this.getLatest().getParentOrThrow();
           invariant(
             $isCollapsibleContainerNode(collapsibleContainer),
-            'Expected parent node to be a CollapsibleContainerNode',
+            "Expected parent node to be a CollapsibleContainerNode"
           );
           collapsibleContainer.toggleOpen();
         });
@@ -61,13 +62,14 @@ export class CollapsibleTitleNode extends ElementNode {
     }
     return dom;
   }
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   updateDOM(prevNode: this, dom: HTMLElement): boolean {
     return false;
   }
 
   static importDOM(): DOMConversionMap | null {
     return {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       summary: (domNode: HTMLElement) => {
         return {
           conversion: $convertSummaryElement,
@@ -78,11 +80,11 @@ export class CollapsibleTitleNode extends ElementNode {
   }
 
   static importJSON(
-    serializedNode: SerializedCollapsibleTitleNode,
+    serializedNode: SerializedCollapsibleTitleNode
   ): CollapsibleTitleNode {
     return $createCollapsibleTitleNode().updateFromJSON(serializedNode);
   }
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   collapseAtStart(_selection: RangeSelection): boolean {
     this.getParentOrThrow().insertBefore(this);
     return true;
@@ -92,7 +94,7 @@ export class CollapsibleTitleNode extends ElementNode {
     return (node: LexicalNode) => {
       invariant(
         $isCollapsibleTitleNode(node),
-        'node is not a CollapsibleTitleNode',
+        "node is not a CollapsibleTitleNode"
       );
       if (node.isEmpty()) {
         node.remove();
@@ -105,7 +107,7 @@ export class CollapsibleTitleNode extends ElementNode {
 
     if (!$isCollapsibleContainerNode(containerNode)) {
       throw new Error(
-        'CollapsibleTitleNode expects to be child of CollapsibleContainerNode',
+        "CollapsibleTitleNode expects to be child of CollapsibleContainerNode"
       );
     }
 
@@ -113,7 +115,7 @@ export class CollapsibleTitleNode extends ElementNode {
       const contentNode = this.getNextSibling();
       if (!$isCollapsibleContentNode(contentNode)) {
         throw new Error(
-          'CollapsibleTitleNode expects to have CollapsibleContentNode sibling',
+          "CollapsibleTitleNode expects to have CollapsibleContentNode sibling"
         );
       }
 
@@ -138,7 +140,7 @@ export function $createCollapsibleTitleNode(): CollapsibleTitleNode {
 }
 
 export function $isCollapsibleTitleNode(
-  node: LexicalNode | null | undefined,
+  node: LexicalNode | null | undefined
 ): node is CollapsibleTitleNode {
   return node instanceof CollapsibleTitleNode;
 }

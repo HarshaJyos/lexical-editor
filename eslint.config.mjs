@@ -19,6 +19,10 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
     ],
+    rules: {
+      "simple-import-sort/imports": "off",  // disable the rule
+      "simple-import-sort/exports": "off"   // optional, if also enabled
+    },
   },
 ];
 

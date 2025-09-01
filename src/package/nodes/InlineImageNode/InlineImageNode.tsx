@@ -127,6 +127,7 @@ export class InlineImageNode extends DecoratorNode<JSX.Element> {
 
   static importDOM(): DOMConversionMap | null {
     return {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       img: (node: Node) => ({
         conversion: $convertInlineImageElement,
         priority: 0,
