@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
-    "@excalidraw/excalidraw": "^0.18.0",
+    "@excalidraw/excalidraw": "^0.17.6",
     "@lexical/clipboard": "^0.34.0",
     "@lexical/code": "^0.34.0",
     "@lexical/file": "^0.34.0",
