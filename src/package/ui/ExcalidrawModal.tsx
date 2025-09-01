@@ -1,32 +1,34 @@
-"use client";
-
-/**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
+"use client"
 import type { JSX } from 'react';
 import dynamic from 'next/dynamic';
-
 import './ExcalidrawModal.css';
-
-
 import { isDOMNode } from 'lexical';
 import * as React from 'react';
 import { ReactPortal, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-
+import { ErrorBoundary } from 'react-error-boundary';
 import Button from './Button';
 import Modal from './Modal';
-import { AppState, BinaryFiles, ExcalidrawImperativeAPI, ExcalidrawInitialDataState } from '@excalidraw/excalidraw/types/types';
 
-// Dynamically import Excalidraw to disable SSR
-const Excalidraw = dynamic(() => import('@excalidraw/excalidraw').then((mod) => mod.Excalidraw), {
-  ssr: false,
-});
+// Import Excalidraw styles (required for v0.18.0)
+import '@excalidraw/excalidraw/index.css';
+import { AppState, BinaryFiles, ExcalidrawImperativeAPI, ExcalidrawInitialDataState } from '@excalidraw/excalidraw/types';
+
+// Dynamic import with loading and error fallbacks
+const Excalidraw = dynamic(
+  () =>
+    import('@excalidraw/excalidraw')
+      .then((mod) => mod.Excalidraw)
+      .catch((err) => {
+        console.error('Failed to load Excalidraw:', err);
+        // eslint-disable-next-line react/display-name
+        return () => <div>Error loading Excalidraw. Please try again.</div>;
+      }),
+  {
+    ssr: false,
+    loading: () => <div>Loading Excalidraw...</div>,
+  }
+);
 
 export type ExcalidrawInitialElements = ExcalidrawInitialDataState['elements'];
 
@@ -46,14 +48,23 @@ type Props = {
 };
 
 export const useCallbackRefState = () => {
-  const [refValue, setRefValue] =
-    React.useState<ExcalidrawImperativeAPI | null>(null);
+  const [refValue, setRefValue] = React.useState<ExcalidrawImperativeAPI | null>(null);
   const refCallback = React.useCallback(
     (value: ExcalidrawImperativeAPI | null) => setRefValue(value),
     [],
   );
   return [refValue, refCallback] as const;
 };
+
+// Error boundary fallback component
+function ErrorFallback({ error }: { error: Error }) {
+  return (
+    <div role="alert" className="ExcalidrawModal__error">
+      <p>Error loading Excalidraw:</p>
+      <pre>{error.message}</pre>
+    </div>
+  );
+}
 
 export default function ExcalidrawModal({
   closeOnClickOutside = false,
@@ -68,9 +79,14 @@ export default function ExcalidrawModal({
   const excaliDrawModelRef = useRef<HTMLDivElement | null>(null);
   const [excalidrawAPI, excalidrawAPIRefCallback] = useCallbackRefState();
   const [discardModalOpen, setDiscardModalOpen] = useState(false);
-  const [elements, setElements] =
-    useState<ExcalidrawInitialElements>(initialElements);
+  const [elements, setElements] = useState<ExcalidrawInitialElements>(initialElements);
   const [files, setFiles] = useState<BinaryFiles>(initialFiles);
+  const [isClient, setIsClient] = useState(false);
+
+  // Ensure client-side rendering
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (excaliDrawModelRef.current !== null) {
@@ -129,7 +145,7 @@ export default function ExcalidrawModal({
 
   const save = () => {
     if (elements && elements.filter((el) => !el.isDeleted).length > 0) {
-      const appState = excalidrawAPI?.getAppState();
+      const appState = excalidrawAPI?.getAppState?.();
       const partialState: Partial<AppState> = {
         exportBackground: appState?.exportBackground,
         exportScale: appState?.exportScale,
@@ -184,7 +200,7 @@ export default function ExcalidrawModal({
     );
   }
 
-  if (isShown === false) {
+  if (isShown === false || !isClient) {
     return null;
   }
 
@@ -206,15 +222,17 @@ export default function ExcalidrawModal({
       >
         <div className="ExcalidrawModal__row">
           {discardModalOpen && <ShowDiscardDialog />}
-          <Excalidraw
-            onChange={onChange}
-            excalidrawAPI={excalidrawAPIRefCallback}
-            initialData={{
-              appState: initialAppState || { isLoading: false },
-              elements: initialElements,
-              files: initialFiles,
-            }}
-          />
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <Excalidraw
+              onChange={onChange}
+              excalidrawAPI={excalidrawAPIRefCallback}
+              initialData={{
+                appState: initialAppState || { isLoading: false },
+                elements: initialElements,
+                files: initialFiles,
+              }}
+            />
+          </ErrorBoundary>
           <div className="ExcalidrawModal__actions">
             <button className="action-button" onClick={discard}>
               Discard
